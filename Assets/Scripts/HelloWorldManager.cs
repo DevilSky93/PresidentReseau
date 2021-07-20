@@ -51,5 +51,10 @@ public class HelloWorldManager : MonoBehaviour
                 }
             }
         }
+
+        if (GUILayout.Button("Shuffle"))
+        {
+            GameManager.instance.CardDistribution();
+        }
     }
 }

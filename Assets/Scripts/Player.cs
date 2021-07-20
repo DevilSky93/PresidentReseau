@@ -1,8 +1,11 @@
 ﻿using MLAPI;
-using UnityEngine;
-using UnityEngine.XR;
 
 public class Player : NetworkBehaviour
 {
     public Hand hand;
+
+    private void Start()
+    {
+        hand = GetComponent<Hand>();
+    }
 }
