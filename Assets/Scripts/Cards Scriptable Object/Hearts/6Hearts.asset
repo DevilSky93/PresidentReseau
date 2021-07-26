@@ -14,5 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   value: 6
   nameCard: 6 of hearts
+  cardMat: {fileID: 2100000, guid: 7763874e4049b9544b6422426f9aa5ae, type: 2}
   colorValue: 0
   symbol: 2

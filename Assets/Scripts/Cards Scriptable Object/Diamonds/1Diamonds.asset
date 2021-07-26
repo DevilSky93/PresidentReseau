@@ -14,5 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   value: 1
   nameCard: Ace of diamonds
+  cardMat: {fileID: 2100000, guid: 97b6651deb9484141bc71cbdf010e890, type: 2}
   colorValue: 0
   symbol: 0

@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using MLAPI;
+using MLAPI.Messaging;
 using UnityEngine;
 
-public class GameManager : MonoBehaviour
+public class GameManager : NetworkBehaviour
 {
   public static GameManager instance;
   public bool isAscending;
-  public Card cardPrefab;
+  public GameObject cardPrefab;
 
   private void Awake()
   {
@@ -21,11 +22,20 @@ public class GameManager : MonoBehaviour
 
     var clients = NetworkManager.Singleton.ConnectedClientsList;
 
+    for (int i = 0; i < clients.Count; i++)
+    {
+      var hand = Instantiate(UIManager.instance.playerHand, UIManager.instance.transform);
+      // hand.transform.position = 
+      clients[i].PlayerObject.GetComponent<Player>().hand = hand;
+    }
+    
     for (int i = 0; i < deck.cards.Count; i++)
     {
-      var card = Instantiate(cardPrefab, Vector3.zero, Quaternion.identity);
+      var card = Instantiate(cardPrefab, clients[i%clients.Count].PlayerObject.GetComponent<Player>().hand.transform).GetComponentInChildren<Card>();
       card.card = deck.cards[i];
+      card.InitCard();
       clients[i%clients.Count].PlayerObject.GetComponent<Player>().hand.cards.Add(card);
+      clients[i%clients.Count].PlayerObject.GetComponent<Player>().hand.SortCard();
     }
   }
 }

@@ -22,9 +22,9 @@ public class HelloWorldManager : MonoBehaviour
 
     private static void StartButtons()
     {
-        if (GUILayout.Button("Host")) NetworkManager.Singleton.StartHost();
-        if (GUILayout.Button("Client")) NetworkManager.Singleton.StartClient();
-        if (GUILayout.Button("Server")) NetworkManager.Singleton.StartServer();
+        if (GUILayout.Button("Host", GUILayout.Width(150f), GUILayout.Height(50f))) NetworkManager.Singleton.StartHost();
+        if (GUILayout.Button("Client", GUILayout.Width(150f), GUILayout.Height(50f))) NetworkManager.Singleton.StartClient();
+        if (GUILayout.Button("Server", GUILayout.Width(150f), GUILayout.Height(50f))) NetworkManager.Singleton.StartServer();
     }
 
     private static void StatusLabels()
@@ -52,9 +52,12 @@ public class HelloWorldManager : MonoBehaviour
             }
         }
 
-        if (GUILayout.Button("Shuffle"))
+        if (NetworkManager.Singleton.IsServer)
         {
-            GameManager.instance.CardDistribution();
+            if (GUILayout.Button("Start Game"))
+            {
+                GameManager.instance.CardDistribution();
+            }   
         }
     }
 }

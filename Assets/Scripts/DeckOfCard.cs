@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using MLAPI;
 using UnityEngine;
 using Random = System.Random;
 
-public class DeckOfCard : MonoBehaviour
+public class DeckOfCard : NetworkBehaviour
 {
   public static DeckOfCard instance;
   public List<CardData> cards = new List<CardData>(52);

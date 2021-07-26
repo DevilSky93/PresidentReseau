@@ -14,5 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   value: 13
   nameCard: King of hearts
+  cardMat: {fileID: 2100000, guid: ac4d439da6ed83449b9df3b4bcdb1928, type: 2}
   colorValue: 0
   symbol: 2

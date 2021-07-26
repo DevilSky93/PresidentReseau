@@ -14,5 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   value: 12
   nameCard: Queen of hearts
+  cardMat: {fileID: 2100000, guid: 6849d1e035a4b9d428d22cbfa9d15267, type: 2}
   colorValue: 0
   symbol: 2

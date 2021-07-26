@@ -14,5 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   value: 13
   nameCard: King of clubs
+  cardMat: {fileID: 2100000, guid: 2d13c4e8312bc4845a6989f2ae4d3ce0, type: 2}
   colorValue: 1
   symbol: 1

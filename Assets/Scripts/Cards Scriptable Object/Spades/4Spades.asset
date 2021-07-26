@@ -14,5 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   value: 4
   nameCard: 4 of spades
+  cardMat: {fileID: 2100000, guid: 116c156d0335fff4ca3d177f56bfd200, type: 2}
   colorValue: 1
   symbol: 3

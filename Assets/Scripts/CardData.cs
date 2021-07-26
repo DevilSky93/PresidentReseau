@@ -6,9 +6,10 @@ using UnityEngine;
 public class CardData : ScriptableObject
 {
     [SerializeField] private int value;
-
     [SerializeField] private string nameCard;
-
+    [SerializeField] private Material cardMat;
+    [SerializeField] private Color colorValue;
+    [SerializeField] private SymbolCard symbol;
     public enum Color
     {
         Red,
@@ -23,8 +24,7 @@ public class CardData : ScriptableObject
         Spades
     }
 
-    [SerializeField] private Color colorValue;
-    [SerializeField] private SymbolCard symbol;
+
 
     public int Value => value;
 
@@ -33,4 +33,6 @@ public class CardData : ScriptableObject
     public Color ColorValue => colorValue;
 
     public SymbolCard Symbol => symbol;
+
+    public Material CardMat => cardMat;
 }

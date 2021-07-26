@@ -14,5 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   value: 10
   nameCard: 10 of clubs
+  cardMat: {fileID: 2100000, guid: 3821c6dbbaf0bef4a881d12d89428faf, type: 2}
   colorValue: 1
   symbol: 1

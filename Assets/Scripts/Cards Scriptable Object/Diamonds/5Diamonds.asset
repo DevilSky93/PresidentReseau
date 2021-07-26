@@ -14,5 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   value: 5
   nameCard: 5 of damonds
+  cardMat: {fileID: 2100000, guid: c4a1d155c71e38446b19711497ecb4c7, type: 2}
   colorValue: 0
   symbol: 0

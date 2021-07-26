@@ -14,5 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   value: 13
   nameCard: King of diamonds
+  cardMat: {fileID: 2100000, guid: 68773df033f2b684899572ae51da2709, type: 2}
   colorValue: 0
   symbol: 0
