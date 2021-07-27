@@ -137,6 +137,6 @@ public class Card : NetworkBehaviour
     [ServerRpc]
     private void PlayCardServerRpc()
     {
-        GameManager.instance.PlayCard(isInHandOf);
+        // GameManager.instance.PlayCard(isInHandOf);
     }
 }

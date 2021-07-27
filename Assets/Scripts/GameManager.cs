@@ -11,17 +11,24 @@ public class GameManager : NetworkBehaviour
   public static GameManager instance;
   public bool isAscending;
   public GameObject cardPrefab;
-
+  public List<Transform> slots = new List<Transform>();
+  public Dictionary<Transform, bool> _slotsDictionary = new Dictionary<Transform, bool>();
+  
   private Hand currentHandPlay;
 
   private List<NetworkClient> _clients = new List<NetworkClient>();
   private void Awake()
   {
     instance = this;
+    foreach (var s in slots)
+    {
+      _slotsDictionary.Add(s, false);
+    }
   }
 
   public void CardDistribution()
   {
+
     var deck = DeckOfCard.instance;
     deck.Shuffle();
 
@@ -33,7 +40,7 @@ public class GameManager : NetworkBehaviour
       clients[i].PlayerObject.GetComponent<Player>().hand = hand;
     }
     
-    for (int i = 0; i < deck.cards.Count; i++)
+    for (int i = 0; i < 7*clients.Count; i++)
     {
       var card = Instantiate(cardPrefab, clients[i%clients.Count].PlayerObject.GetComponent<Player>().hand.transform).GetComponentInChildren<Card>();
       card.card = deck.cards[i];
