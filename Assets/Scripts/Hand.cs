@@ -5,7 +5,7 @@ using UnityEngine;
 public class Hand : NetworkBehaviour
 {
     public List<Card> cards = new List<Card>();
-
+    public List<Card> selectedCards = new List<Card>();
     public void SortCard()
     {
         int i = 0;

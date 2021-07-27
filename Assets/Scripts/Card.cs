@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using DG.Tweening;
 using MLAPI;
+using MLAPI.Messaging;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -8,6 +10,7 @@ public class Card : NetworkBehaviour
 {
     public CardData card;
     public MeshRenderer theRenderer;
+    public Hand isInHandOf;
 
     private int value;
     private string nameCard;
@@ -21,8 +24,9 @@ public class Card : NetworkBehaviour
     private Vector3 _offset;
     private float zCoord;
 
-    public void InitCard()
+    public void InitCard(Hand h)
     {
+        isInHandOf = h;
         theRenderer.material = card.CardMat;
         value = card.Value;
         nameCard = card.NameCard;
@@ -46,10 +50,6 @@ public class Card : NetworkBehaviour
         _screenPoint = Camera.main.WorldToScreenPoint(transform.position);
         zCoord = Camera.main.WorldToScreenPoint(transform.position).z;
         _isSelected = true;
-        // _offset = transform.position -
-        //          Camera.main.ScreenToWorldPoint(
-        //              new Vector3(Input.mousePosition.x, Input.mousePosition.y, _screenPoint.z));
-
         _offset = transform.position - GetMouseWorldPos();
     }
 
@@ -64,7 +64,7 @@ public class Card : NetworkBehaviour
     {
         if (_isInHand && !_isSelected)
         {
-            transform.DOLocalMove(Vector2.zero, .2f).SetEase(Ease.OutCubic).OnStart(() =>
+            transform.DOLocalMove(new Vector3(0f, 0f, transform.localPosition.z), .2f).SetEase(Ease.OutCubic).OnStart(() =>
             {
                 _isOver = false;
             });
@@ -73,20 +73,53 @@ public class Card : NetworkBehaviour
 
     private void OnMouseUp()
     {
-        _isSelected = false;
+        // _isSelected = false;
         var mousePos = Input.mousePosition;
         if (mousePos.y > Screen.currentResolution.height / 2f)
         {
+            if (NetworkManager.Singleton.ConnectedClients.TryGetValue(NetworkManager.Singleton.LocalClientId,
+                out var networkedClient))
+            {
+                PlayCardServerRpc();
+            }
             Debug.Log("Play card !");
             _isInHand = false;
+            _isSelected = false;
         }
         else
         {
             Debug.Log("Not playing card !");
-            transform.DOLocalMove(Vector2.zero, .2f).SetEase(Ease.OutCubic).OnStart(() =>
+            
+            if (isInHandOf.selectedCards.Find(x=>x.nameCard == nameCard) != null)
             {
-                _isOver = false;
-            });
+                isInHandOf.selectedCards.Remove(this);
+                _isSelected = false;
+                transform.DOLocalMove(new Vector3(0f, 0f, transform.localPosition.z), .2f).SetEase(Ease.OutCubic).OnStart(() =>
+                {
+                    _isOver = false;
+                });
+                return;
+            }
+            
+            if (isInHandOf.selectedCards.Count > 0)
+            {
+                if (isInHandOf.selectedCards[0].value == value)
+                {
+                    isInHandOf.selectedCards.Add(this);
+                }
+                else
+                {
+                    _isSelected = false;
+                    transform.DOLocalMove(new Vector3(0f, 0f, transform.localPosition.z), .2f).SetEase(Ease.OutCubic).OnStart(() =>
+                    {
+                        _isOver = false;
+                    });
+                }
+            }
+            else if(isInHandOf.selectedCards.Find(x=> x.nameCard == nameCard) == null)
+            {
+                isInHandOf.selectedCards.Add(this);
+            }
         }
     }
 
@@ -99,5 +132,11 @@ public class Card : NetworkBehaviour
         mousePoint.z = zCoord;
 
         return Camera.main.ScreenToWorldPoint(mousePoint);
+    }
+
+    [ServerRpc]
+    private void PlayCardServerRpc()
+    {
+        GameManager.instance.PlayCard(isInHandOf);
     }
 }
