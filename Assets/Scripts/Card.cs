@@ -49,7 +49,7 @@ public class Card : NetworkBehaviour
     {
         _screenPoint = Camera.main.WorldToScreenPoint(transform.position);
         zCoord = Camera.main.WorldToScreenPoint(transform.position).z;
-        _isSelected = true;
+        _isSelected = !_isSelected;
         _offset = transform.position - GetMouseWorldPos();
     }
 
@@ -73,7 +73,6 @@ public class Card : NetworkBehaviour
 
     private void OnMouseUp()
     {
-        // _isSelected = false;
         var mousePos = Input.mousePosition;
         if (mousePos.y > Screen.currentResolution.height / 2f)
         {
@@ -89,14 +88,13 @@ public class Card : NetworkBehaviour
         else
         {
             Debug.Log("Not playing card !");
-
-            transform.DOLocalMove(Vector2.zero, .2f).SetEase(Ease.OutCubic);
             
+            // If other card selected and same value
             if (isInHandOf.selectedCards.Find(x=>x.nameCard == nameCard) != null)
             {
                 isInHandOf.selectedCards.Remove(this);
                 _isSelected = false;
-                transform.DOLocalMove(new Vector3(0f, 0f, transform.localPosition.z), .2f).SetEase(Ease.OutCubic).OnStart(() =>
+                transform.DOLocalMove(Vector3.zero, .2f).SetEase(Ease.OutCubic).OnStart(() =>
                 {
                     _isOver = false;
                 });
@@ -112,7 +110,7 @@ public class Card : NetworkBehaviour
                 else
                 {
                     _isSelected = false;
-                    transform.DOLocalMove(new Vector3(0f, 0f, transform.localPosition.z), .2f).SetEase(Ease.OutCubic).OnStart(() =>
+                    transform.DOLocalMove(Vector3.zero, .2f).SetEase(Ease.OutCubic).OnStart(() =>
                     {
                         _isOver = false;
                     });
@@ -121,6 +119,17 @@ public class Card : NetworkBehaviour
             else if(isInHandOf.selectedCards.Find(x=> x.nameCard == nameCard) == null)
             {
                 isInHandOf.selectedCards.Add(this);
+                if (Vector2.Distance(Vector2.zero, new Vector2(transform.localPosition.x, transform.localPosition.y)) > .5f)
+                {
+                    transform.DOLocalMove(Vector2.zero, .2f).SetEase(Ease.OutCubic);                    
+                }
+                else
+                {
+                    transform.DOLocalMove(new Vector3(0, .2f, transform.localPosition.z), .2f).SetEase(Ease.OutCubic).OnStart(() =>
+                    {
+                        _isOver = true;
+                    });
+                }
             }
         }
     }
@@ -129,7 +138,7 @@ public class Card : NetworkBehaviour
     {
         Vector3 mousePoint = Input.mousePosition;
 
-        mousePoint.x = mousePoint.x/1.5f;
+        mousePoint.x = mousePoint.x/1.4f;
         mousePoint.y = mousePoint.y*1.5f;
         mousePoint.z = zCoord;
 

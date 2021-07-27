@@ -66,14 +66,13 @@ public class HelloWorldPlayer : NetworkBehaviour
 
     private static Transform PositionSlotsPlayer()
     {
-        for (int i = 0; i < GameManager.instance.slots.Count; i++)
+        for (int i = 0; i < HelloWorldManager.instance.slots.Count; i++)
         {
-            if (!GameManager.instance._slotsDictionary[GameManager.instance.slots[i]])
+            if (!HelloWorldManager.instance._slotsDictionary[HelloWorldManager.instance.slots[i]])
             {
-                GameManager.instance._slotsDictionary[GameManager.instance.slots[i]] = true;
-                return GameManager.instance.slots[i];
+                HelloWorldManager.instance._slotsDictionary[HelloWorldManager.instance.slots[i]] = true;
+                return HelloWorldManager.instance.slots[i];
             }
-            
         }
         return null;
     }
