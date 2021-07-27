@@ -24,8 +24,6 @@ public class CardData : ScriptableObject
         Spades
     }
 
-
-
     public int Value => value;
 
     public string NameCard => nameCard;

@@ -37,8 +37,9 @@ public class HelloWorldPlayer : NetworkBehaviour
         if (NetworkManager.Singleton.IsServer)
         {
             var pos = PositionSlotsPlayer();
-            transform.position = pos;
-            position.Value = pos;
+            transform.position = pos.position;
+            transform.eulerAngles = pos.eulerAngles;
+            position.Value = pos.position;
         }
         else
         {
@@ -55,7 +56,7 @@ public class HelloWorldPlayer : NetworkBehaviour
     [ServerRpc]
     private void PlacePlayerServerRpc(ServerRpcParams rpcParams = default)
     {
-        position.Value = PositionSlotsPlayer();
+        position.Value = PositionSlotsPlayer().position;
     }
 
     private static Vector3 GetRandomPositionOnPlane()
@@ -63,19 +64,18 @@ public class HelloWorldPlayer : NetworkBehaviour
         return new Vector3(Random.Range(-3f, 3f), 1f, Random.Range(-3f, 3f));
     }
 
-    private static Vector3 PositionSlotsPlayer()
+    private static Transform PositionSlotsPlayer()
     {
         for (int i = 0; i < GameManager.instance.slots.Count; i++)
         {
             if (!GameManager.instance._slotsDictionary[GameManager.instance.slots[i]])
             {
                 GameManager.instance._slotsDictionary[GameManager.instance.slots[i]] = true;
-                return GameManager.instance.slots[i].position;
+                return GameManager.instance.slots[i];
             }
             
         }
-
-        return Vector3.zero;
+        return null;
     }
 
     public void Update()

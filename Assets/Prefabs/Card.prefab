@@ -111,7 +111,7 @@ Transform:
   m_GameObject: {fileID: 5601708383940813848}
   m_LocalRotation: {x: 0, y: 0, z: 1, w: 0}
   m_LocalPosition: {x: 0, y: 1.308, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 0.02}
+  m_LocalScale: {x: 1, y: 1.6, z: 0.02}
   m_Children:
   - {fileID: 550868835934021899}
   m_Father: {fileID: 0}
@@ -193,6 +193,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   card: {fileID: 11400000, guid: 4a38e479a57c5d842a2cbac3d11a82f2, type: 2}
   theRenderer: {fileID: 5601708383940813850}
+  isInHandOf: {fileID: 0}
 --- !u!65 &147308892
 BoxCollider:
   m_ObjectHideFlags: 0

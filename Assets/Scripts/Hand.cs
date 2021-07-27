@@ -12,7 +12,7 @@ public class Hand : NetworkBehaviour
         foreach (Transform card in transform)
         {
             var position = card.localPosition;
-            position = new Vector3(position.x, position.y, position.z - (i / 10f));
+            position = new Vector3(position.x+i*.7f, position.y, position.z - (i / 1000f));
             card.localPosition = position;
             i++;
         }

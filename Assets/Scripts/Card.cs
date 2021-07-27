@@ -38,7 +38,7 @@ public class Card : NetworkBehaviour
     {
         if (_isInHand && !_isOver)
         {
-            transform.DOLocalMove(new Vector2(0, .2f), .2f).SetEase(Ease.OutCubic).OnStart(() =>
+            transform.DOLocalMove(new Vector3(0, .2f, transform.localPosition.z), .2f).SetEase(Ease.OutCubic).OnStart(() =>
             {
                 _isOver = true;
             });
@@ -56,8 +56,8 @@ public class Card : NetworkBehaviour
     private void OnMouseDrag()
     {
         var mousePos = Input.mousePosition;
-
-        transform.position = GetMouseWorldPos() + _offset;
+        
+        transform.position = new Vector3(GetMouseWorldPos().x + _offset.x, GetMouseWorldPos().y + _offset.y, transform.position.z);
     }
 
     private void OnMouseExit()
@@ -77,11 +77,11 @@ public class Card : NetworkBehaviour
         var mousePos = Input.mousePosition;
         if (mousePos.y > Screen.currentResolution.height / 2f)
         {
-            if (NetworkManager.Singleton.ConnectedClients.TryGetValue(NetworkManager.Singleton.LocalClientId,
-                out var networkedClient))
-            {
-                PlayCardServerRpc();
-            }
+            // if (NetworkManager.Singleton.ConnectedClients.TryGetValue(NetworkManager.Singleton.LocalClientId,
+            //     out var networkedClient))
+            // {
+            //     PlayCardServerRpc();
+            // }
             Debug.Log("Play card !");
             _isInHand = false;
             _isSelected = false;
@@ -89,6 +89,8 @@ public class Card : NetworkBehaviour
         else
         {
             Debug.Log("Not playing card !");
+
+            transform.DOLocalMove(Vector2.zero, .2f).SetEase(Ease.OutCubic);
             
             if (isInHandOf.selectedCards.Find(x=>x.nameCard == nameCard) != null)
             {
@@ -127,8 +129,8 @@ public class Card : NetworkBehaviour
     {
         Vector3 mousePoint = Input.mousePosition;
 
-        mousePoint.x = mousePoint.x/2f;
-        mousePoint.y = mousePoint.y;
+        mousePoint.x = mousePoint.x/1.5f;
+        mousePoint.y = mousePoint.y*1.5f;
         mousePoint.z = zCoord;
 
         return Camera.main.ScreenToWorldPoint(mousePoint);
