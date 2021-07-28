@@ -88,26 +88,21 @@ public class Player : NetworkBehaviour
         }
     }
 
-    [ServerRpc]
+    [ServerRpc(RequireOwnership = false)]
     public void RetrieveCardServerSideServerRpc()
     {
-        //Spawn object
-
-        for (int i = 0; i < 7; i++)
-        {
-            var c = InstantiateCard(i);
-            ulong cardId = c.GetComponent<NetworkObject>().NetworkObjectId;
-            RetrieveListClientRpc(cardId);
-        }
-        hand.SortCard();
+        RetrieveListClientRpc();
     }
 
     [ClientRpc]
-    private void RetrieveListClientRpc(ulong cardId, ClientRpcParams clientRpcParams = default)
+    private void RetrieveListClientRpc(ClientRpcParams clientRpcParams = default)
     {
-        var spawnedCard = NetworkSpawnManager.SpawnedObjects[cardId].gameObject.GetComponentInChildren<Card>();
-        spawnedCard.transform.root.SetParent(hand.transform);
-        Debug.Log("Cards list receive");
+        for (int i = 0; i < 7; i++)
+        {
+            var c = InstantiateCard(i);
+            c.transform.root.SetParent(hand.transform);
+        }
+        hand.SortCard();
     }
 
     private GameObject InstantiateCard(int idx)
@@ -116,8 +111,9 @@ public class Player : NetworkBehaviour
         deck.Shuffle();
 
         GameObject c = Instantiate(cardPrefab, hand.transform);
-        c.GetComponent<NetworkObject>().Spawn();
+        // c.GetComponent<NetworkObject>().Spawn();
         c.GetComponentInChildren<Card>().card = deck.cards[idx];
+        deck.cards.RemoveAt(idx);
         c.GetComponentInChildren<Card>().InitCard(hand);
         hand.cards.Add(c.GetComponentInChildren<Card>());
 

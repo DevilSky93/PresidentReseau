@@ -95,6 +95,7 @@ GameObject:
   - component: {fileID: 5601708383940813851}
   - component: {fileID: 5844331999768699057}
   - component: {fileID: 147308892}
+  - component: {fileID: -6442396764233253453}
   m_Layer: 5
   m_Name: Card
   m_TagString: Untagged
@@ -194,6 +195,17 @@ MonoBehaviour:
   card: {fileID: 11400000, guid: 4a38e479a57c5d842a2cbac3d11a82f2, type: 2}
   theRenderer: {fileID: 5601708383940813850}
   isInHandOf: {fileID: 0}
+  collider: {fileID: 147308892}
+  value:
+    m_InternalValue: 0
+  nameCard:
+    m_InternalValue: 
+  colorValue:
+    m_InternalValue: 0
+  symbol:
+    m_InternalValue: 0
+  position:
+    m_InternalValue: {x: 0, y: 0, z: 0}
 --- !u!65 &147308892
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -207,3 +219,19 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 1.0000001, y: 1, z: 0.99999994}
   m_Center: {x: 0, y: -0.000000059604645, z: 0}
+--- !u!54 &-6442396764233253453
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5601708383940813848}
+  serializedVersion: 2
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_UseGravity: 1
+  m_IsKinematic: 1
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 3

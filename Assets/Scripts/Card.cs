@@ -2,24 +2,19 @@
 using System.Collections.Generic;
 using DG.Tweening;
 using MLAPI;
+using MLAPI.Connection;
 using MLAPI.Messaging;
 using MLAPI.NetworkVariable;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-[Serializable]
 public class Card : NetworkBehaviour
 {
     public CardData card;
     public MeshRenderer theRenderer;
     public Hand isInHandOf;
-
-    public NetworkVariableULong idOwner = new NetworkVariableULong(new NetworkVariableSettings
-    {
-        WritePermission = NetworkVariablePermission.Everyone,
-        ReadPermission = NetworkVariablePermission.Everyone
-    });
-
+    public BoxCollider collider;
+    
     public NetworkVariable<int> value = new NetworkVariable<int>(new NetworkVariableSettings
     {
         WritePermission = NetworkVariablePermission.Everyone,
@@ -44,10 +39,8 @@ public class Card : NetworkBehaviour
     private bool _isInHand = true;
     private bool _isOver, _isSelected;
 
-    private Vector3 _screenPoint;
     private Vector3 _offset;
     private float _zCoord;
-    
     
     public NetworkVariableVector3 position = new NetworkVariableVector3(new NetworkVariableSettings
     {
@@ -57,25 +50,10 @@ public class Card : NetworkBehaviour
 
     private void Update()
     {
-        transform.localPosition = position.Value;
-        // if (!IsLocalPlayer)
-        // {
-        //     transform.parent.SetParent(isInHandOf.transform);
-        // }
-    }
-
-    private void Start()
-    {
-        // if (NetworkManager.Singleton.ConnectedClients.TryGetValue(NetworkManager.Singleton.LocalClientId,
-        //     out var networkedClient))
-        // {
-        //     var player = networkedClient.PlayerObject.GetComponent<Player>();
-        //     if (player)
-        //     {
-        //         isInHandOf = player.hand;
-        //         isInHandOf.SortCard();
-        //     }
-        // }
+        if (_isInHand)
+        {
+            transform.localPosition = position.Value;
+        }
     }
 
     public void InitCard(Hand h)
@@ -104,7 +82,6 @@ public class Card : NetworkBehaviour
     
     private void OnMouseDown()
     {
-        _screenPoint = Camera.main.WorldToScreenPoint(transform.position);
         _zCoord = Camera.main.WorldToScreenPoint(transform.position).z;
         _isSelected = !_isSelected;
         _offset = transform.position - GetMouseWorldPos();
@@ -119,36 +96,33 @@ public class Card : NetworkBehaviour
 
     private void OnMouseExit()
     {
-        if (_isInHand && !_isSelected)
-        {
-            transform.DOLocalMove(new Vector3(0f, 0f, transform.localPosition.z), .2f).SetEase(Ease.OutCubic).OnStart(() =>
-            {
-                _isOver = false;
-            }).OnUpdate(() =>
-            {
-                position.Value = transform.localPosition;
-            });
-        }
+        // if (_isInHand && !_isSelected)
+        // {
+        //     transform.DOLocalMove(new Vector3(0f, 0f, transform.localPosition.z), .2f).SetEase(Ease.OutCubic).OnStart(() =>
+        //     {
+        //         _isOver = false;
+        //     }).OnUpdate(() =>
+        //     {
+        //         position.Value = transform.localPosition;
+        //     });
+        // }
     }
 
     private void OnMouseUp()
     {
         var mousePos = Input.mousePosition;
-        if (mousePos.y > Screen.currentResolution.height / 2f)
+        if (mousePos.y > Screen.height / 2f)
         {
-            // if (NetworkManager.Singleton.ConnectedClients.TryGetValue(NetworkManager.Singleton.LocalClientId,
-            //     out var networkedClient))
-            // {
-            //     PlayCardServerRpc();
-            // }
-            Debug.Log("Play card !");
-            _isInHand = false;
-            _isSelected = false;
+            if (NetworkManager.Singleton.ConnectedClients.TryGetValue(NetworkManager.Singleton.LocalClientId,
+                out var networkedClient))
+            {
+                var player = networkedClient.PlayerObject.GetComponent<Player>().hand;
+                player.PlayCardServerRpc();
+            }
         }
         else
         {
             Debug.Log("Not playing card !");
-            
             // If other card selected and same value
             if (isInHandOf.selectedCards.Find(x=>x.nameCard == nameCard) != null)
             {
@@ -166,7 +140,7 @@ public class Card : NetworkBehaviour
             
             if (isInHandOf.selectedCards.Count > 0)
             {
-                if (isInHandOf.selectedCards[0].value == value)
+                if (isInHandOf.selectedCards[0].value.Value == value.Value)
                 {
                     isInHandOf.selectedCards.Add(this);
                 }
@@ -182,7 +156,7 @@ public class Card : NetworkBehaviour
                     });
                 }
             }
-            else if(isInHandOf.selectedCards.Find(x=> x.nameCard == nameCard) == null)
+            else if(isInHandOf.selectedCards.Find(x=> x.nameCard.Value == nameCard.Value) == null)
             {
                 isInHandOf.selectedCards.Add(this);
                 if (Vector2.Distance(Vector2.zero, new Vector2(transform.localPosition.x, transform.localPosition.y)) > .5f)
@@ -217,9 +191,14 @@ public class Card : NetworkBehaviour
         return Camera.main.ScreenToWorldPoint(mousePoint);
     }
 
-    [ServerRpc]
-    private void PlayCardServerRpc()
+    public void CardPlay()
     {
-        // GameManager.instance.PlayCard(isInHandOf);
+        _isInHand = false;
+        _isSelected = false;
+    }
+    
+    public void CardCancelled()
+    {
+        _isSelected = false;
     }
 }
