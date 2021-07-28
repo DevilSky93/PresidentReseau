@@ -3,35 +3,89 @@ using System.Collections.Generic;
 using DG.Tweening;
 using MLAPI;
 using MLAPI.Messaging;
+using MLAPI.NetworkVariable;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
+[Serializable]
 public class Card : NetworkBehaviour
 {
     public CardData card;
     public MeshRenderer theRenderer;
     public Hand isInHandOf;
 
-    private int value;
-    private string nameCard;
-    private CardData.Color colorValue;
-    private CardData.SymbolCard symbol;
+    public NetworkVariableULong idOwner = new NetworkVariableULong(new NetworkVariableSettings
+    {
+        WritePermission = NetworkVariablePermission.Everyone,
+        ReadPermission = NetworkVariablePermission.Everyone
+    });
+
+    public NetworkVariable<int> value = new NetworkVariable<int>(new NetworkVariableSettings
+    {
+        WritePermission = NetworkVariablePermission.Everyone,
+        ReadPermission = NetworkVariablePermission.Everyone
+    });
+    public NetworkVariable<string> nameCard = new NetworkVariable<string>(new NetworkVariableSettings
+    {
+        WritePermission = NetworkVariablePermission.Everyone,
+        ReadPermission = NetworkVariablePermission.Everyone
+    });
+    public NetworkVariable<CardData.Color> colorValue = new NetworkVariable<CardData.Color>(new NetworkVariableSettings
+    {
+        WritePermission = NetworkVariablePermission.Everyone,
+        ReadPermission = NetworkVariablePermission.Everyone
+    });
+    public NetworkVariable<CardData.SymbolCard> symbol = new NetworkVariable<CardData.SymbolCard>(new NetworkVariableSettings
+    {
+        WritePermission = NetworkVariablePermission.Everyone,
+        ReadPermission = NetworkVariablePermission.Everyone
+    });
 
     private bool _isInHand = true;
     private bool _isOver, _isSelected;
 
     private Vector3 _screenPoint;
     private Vector3 _offset;
-    private float zCoord;
+    private float _zCoord;
+    
+    
+    public NetworkVariableVector3 position = new NetworkVariableVector3(new NetworkVariableSettings
+    {
+        WritePermission = NetworkVariablePermission.Everyone,
+        ReadPermission = NetworkVariablePermission.Everyone
+    });
+
+    private void Update()
+    {
+        transform.localPosition = position.Value;
+        // if (!IsLocalPlayer)
+        // {
+        //     transform.parent.SetParent(isInHandOf.transform);
+        // }
+    }
+
+    private void Start()
+    {
+        // if (NetworkManager.Singleton.ConnectedClients.TryGetValue(NetworkManager.Singleton.LocalClientId,
+        //     out var networkedClient))
+        // {
+        //     var player = networkedClient.PlayerObject.GetComponent<Player>();
+        //     if (player)
+        //     {
+        //         isInHandOf = player.hand;
+        //         isInHandOf.SortCard();
+        //     }
+        // }
+    }
 
     public void InitCard(Hand h)
     {
         isInHandOf = h;
         theRenderer.material = card.CardMat;
-        value = card.Value;
-        nameCard = card.NameCard;
-        colorValue = card.ColorValue;
-        symbol = card.Symbol;
+        value.Value = card.Value;
+        nameCard.Value = card.NameCard;
+        colorValue.Value = card.ColorValue;
+        symbol.Value = card.Symbol;
     }
 
     private void OnMouseEnter()
@@ -41,6 +95,9 @@ public class Card : NetworkBehaviour
             transform.DOLocalMove(new Vector3(0, .2f, transform.localPosition.z), .2f).SetEase(Ease.OutCubic).OnStart(() =>
             {
                 _isOver = true;
+            }).OnUpdate(() =>
+            {
+                position.Value = transform.localPosition;
             });
         }
     }
@@ -48,7 +105,7 @@ public class Card : NetworkBehaviour
     private void OnMouseDown()
     {
         _screenPoint = Camera.main.WorldToScreenPoint(transform.position);
-        zCoord = Camera.main.WorldToScreenPoint(transform.position).z;
+        _zCoord = Camera.main.WorldToScreenPoint(transform.position).z;
         _isSelected = !_isSelected;
         _offset = transform.position - GetMouseWorldPos();
     }
@@ -67,6 +124,9 @@ public class Card : NetworkBehaviour
             transform.DOLocalMove(new Vector3(0f, 0f, transform.localPosition.z), .2f).SetEase(Ease.OutCubic).OnStart(() =>
             {
                 _isOver = false;
+            }).OnUpdate(() =>
+            {
+                position.Value = transform.localPosition;
             });
         }
     }
@@ -97,6 +157,9 @@ public class Card : NetworkBehaviour
                 transform.DOLocalMove(Vector3.zero, .2f).SetEase(Ease.OutCubic).OnStart(() =>
                 {
                     _isOver = false;
+                }).OnUpdate(() =>
+                {
+                    position.Value = transform.localPosition;
                 });
                 return;
             }
@@ -113,6 +176,9 @@ public class Card : NetworkBehaviour
                     transform.DOLocalMove(Vector3.zero, .2f).SetEase(Ease.OutCubic).OnStart(() =>
                     {
                         _isOver = false;
+                    }).OnUpdate(() =>
+                    {
+                        position.Value = transform.localPosition;
                     });
                 }
             }
@@ -121,13 +187,19 @@ public class Card : NetworkBehaviour
                 isInHandOf.selectedCards.Add(this);
                 if (Vector2.Distance(Vector2.zero, new Vector2(transform.localPosition.x, transform.localPosition.y)) > .5f)
                 {
-                    transform.DOLocalMove(Vector2.zero, .2f).SetEase(Ease.OutCubic);                    
+                    transform.DOLocalMove(Vector2.zero, .2f).SetEase(Ease.OutCubic).OnUpdate(() =>
+                    {
+                        position.Value = transform.localPosition;
+                    });                    
                 }
                 else
                 {
                     transform.DOLocalMove(new Vector3(0, .2f, transform.localPosition.z), .2f).SetEase(Ease.OutCubic).OnStart(() =>
                     {
                         _isOver = true;
+                    }).OnUpdate(() =>
+                    {
+                        position.Value = transform.localPosition;
                     });
                 }
             }
@@ -140,7 +212,7 @@ public class Card : NetworkBehaviour
 
         mousePoint.x = mousePoint.x/1.4f;
         mousePoint.y = mousePoint.y*1.5f;
-        mousePoint.z = zCoord;
+        mousePoint.z = _zCoord;
 
         return Camera.main.ScreenToWorldPoint(mousePoint);
     }

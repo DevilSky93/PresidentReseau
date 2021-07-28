@@ -228,7 +228,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   position:
     m_InternalValue: {x: 0, y: 0, z: 0}
+  rotation:
+    m_InternalValue: {x: 0, y: 0, z: 0}
+  canPlay:
+    m_InternalValue: 0
+  hand: {fileID: 145736821464170730}
+  cardPrefab: {fileID: 205171351106899482, guid: f90b3bae9604f82429813140adc32355, type: 3}
   isPlaced: 0
+  cam: {fileID: 4026859644596846196}
 --- !u!114 &791402347883483849
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -241,7 +248,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 676fe2c60a584f61b6b0898e5448ae6b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  hand: {fileID: 145736821464170730}
 --- !u!1 &8649803324624323208
 GameObject:
   m_ObjectHideFlags: 0

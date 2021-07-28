@@ -2,7 +2,7 @@
 using MLAPI;
 using UnityEngine;
 
-public class Hand : NetworkBehaviour
+public class Hand : MonoBehaviour
 {
     public List<Card> cards = new List<Card>();
     public List<Card> selectedCards = new List<Card>();
@@ -14,6 +14,7 @@ public class Hand : NetworkBehaviour
             var position = card.localPosition;
             position = new Vector3(position.x+i*.7f, position.y, position.z - (i / 1000f));
             card.localPosition = position;
+            card.GetComponentInChildren<Card>().position.Value = Vector3.zero;
             i++;
         }
     }
