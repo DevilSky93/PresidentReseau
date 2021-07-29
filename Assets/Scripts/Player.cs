@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using MLAPI;
 using MLAPI.Messaging;
 using MLAPI.NetworkVariable;
-using MLAPI.Spawning;
 using UnityEngine;
 
 public class Player : NetworkBehaviour
@@ -26,12 +23,7 @@ public class Player : NetworkBehaviour
         WritePermission = NetworkVariablePermission.ServerOnly,
         ReadPermission = NetworkVariablePermission.Everyone
     });
-
-    // public NetworkVariable<List<Card>> hand = new NetworkVariable<List<Card>>(new NetworkVariableSettings
-    // {
-    //   WritePermission  = NetworkVariablePermission.ServerOnly,
-    //   ReadPermission = NetworkVariablePermission.Everyone
-    // });
+    
     public Hand hand;
     public GameObject cardPrefab;
 
@@ -118,5 +110,17 @@ public class Player : NetworkBehaviour
         hand.cards.Add(c.GetComponentInChildren<Card>());
 
         return c;
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    public void EndTurnServerRpc(bool play)
+    {
+        EndTurnClientRpc(play);
+    }
+
+    [ClientRpc]
+    public void EndTurnClientRpc(bool play)
+    {
+        canPlay.Value = play;
     }
 }

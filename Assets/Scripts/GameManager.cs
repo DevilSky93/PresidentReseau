@@ -1,13 +1,8 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Security.Cryptography;
 using MLAPI;
 using MLAPI.Connection;
 using MLAPI.Messaging;
 using MLAPI.NetworkVariable;
-using MLAPI.Spawning;
-using UnityEditor;
 using UnityEngine;
 
 public class GameManager : NetworkBehaviour
@@ -28,13 +23,15 @@ public class GameManager : NetworkBehaviour
         WritePermission = NetworkVariablePermission.ServerOnly,
         ReadPermission = NetworkVariablePermission.Everyone
     });
-    // private Hand currentHandPlay;
     public static Stack<Card> currentCardsPlay = new Stack<Card>();
 
     private List<NetworkClient> _clients = new List<NetworkClient>();
     private void Awake()
     {
-        instance = this;
+        if (instance == null)
+        {
+            instance = this;
+        }
         foreach (var s in slots)
         {
             _slotsDictionary.Add(s, false);
@@ -78,10 +75,10 @@ public class GameManager : NetworkBehaviour
             StatusLabels();
 
             PlacePosition();
-            if (_gameStarted.Value)
-            {
-                EndTurn();
-            }
+            // if (_gameStarted.Value)
+            // {
+            //     EndTurn();
+            // }
         }
 
         GUILayout.EndArea();
@@ -106,55 +103,39 @@ public class GameManager : NetworkBehaviour
         GUILayout.Label("Mode: " + mode);
         if (_gameStarted.Value)
         {
-            GUILayout.Label("Player turn : " +
-                            (turnCounter.Value % _clients.Count == 0 ? 1 : turnCounter.Value % _clients.Count));
+            // GUILayout.Label("Player turn : " +
+            //                 (turnCounter.Value % _clients.Count == 0 ? 1 : turnCounter.Value % _clients.Count));
+            GUILayout.Label("Turn counter : " + turnCounter.Value);
         }
     }
 
-    private void EndTurn()
-    {
-        if (NetworkManager.Singleton.ConnectedClients.TryGetValue(NetworkManager.Singleton.LocalClientId,
-            out var networkedClient))
-        {
-            if (networkedClient.PlayerObject.GetComponent<Player>().canPlay.Value)
-            {
-                if (GUILayout.Button("End turn"))
-                {
-                    _clients[(turnCounter.Value-1)%_clients.Count].PlayerObject.GetComponent<Player>().canPlay.Value = false;
-                    turnCounter.Value++;
-                    _clients[(turnCounter.Value-1)%_clients.Count].PlayerObject.GetComponent<Player>().canPlay.Value = true;
-                    // ChangeTurnClientRpc();
-                }  
-            }
-        }
-    }
-
-    // [ClientRpc]
-    // private void EndTurnButtonClientRpc()
-    // {
-    //     if (GUILayout.Button("End turn"))
-    //     {
-    //         _clients[(turnCounter.Value-1)%_clients.Count].PlayerObject.GetComponent<Player>().canPlay.Value = false;
-    //         turnCounter.Value++;
-    //         _clients[(turnCounter.Value-1)%_clients.Count].PlayerObject.GetComponent<Player>().canPlay.Value = true;
-    //         // ChangeTurnClientRpc();
-    //     }  
-    // }
-    //
-    // [ClientRpc]
-    // private void ChangeTurnClientRpc()
+    // private void EndTurn()
     // {
     //     if (NetworkManager.Singleton.ConnectedClients.TryGetValue(NetworkManager.Singleton.LocalClientId,
     //         out var networkedClient))
     //     {
-    //         if (_clients[(turnCounter.Value-1)%_clients.Count].PlayerObject.GetComponent<Player>().canPlay.Value)
+    //         if (networkedClient.PlayerObject.GetComponent<Player>().canPlay.Value)
     //         {
-    //             networkedClient.PlayerObject.GetComponent<Player>().canPlay.Value = true;
+    //             if (GUILayout.Button("End turn"))
+    //             {
+    //                 _clients[(turnCounter.Value-1)%_clients.Count].PlayerObject.GetComponent<Player>().canPlay.Value = false;
+    //                 turnCounter.Value++;
+    //                 _clients[(turnCounter.Value-1)%_clients.Count].PlayerObject.GetComponent<Player>().canPlay.Value = true;
+    //                 networkedClient.PlayerObject.GetComponent<Player>().EndTurnServerRpc(false);
+    //                 _clients[(turnCounter.Value - 1) % _clients.Count].PlayerObject.GetComponent<Player>()
+    //                     .EndTurnServerRpc(true);
+    //             }  
     //         }
-    //         
     //     }
     // }
 
+    // [ClientRpc]
+    // public void UpdateTurnClientRpc()
+    // {
+    //     turnCounter.Value++;
+    //     _clients[(turnCounter.Value-1)%_clients.Count].PlayerObject.GetComponent<Player>().canPlay.Value = true;
+    // }
+    
     private void PlacePosition()
     {
         if (NetworkManager.Singleton.ConnectedClients.TryGetValue(NetworkManager.Singleton.LocalClientId,
@@ -168,7 +149,7 @@ public class GameManager : NetworkBehaviour
             }
         }
 
-        if (NetworkManager.Singleton.IsServer)
+        if (NetworkManager.Singleton.IsServer && !_gameStarted.Value)
         {
             if (GUILayout.Button("Start Game"))
             {
@@ -187,9 +168,4 @@ public class GameManager : NetworkBehaviour
             client.PlayerObject.GetComponent<Player>().RetrieveCardServerSideServerRpc();
         }
     }
-
-    // public void PlayCard(Hand h)
-    // {
-    //     currentHandPlay.cards = currentHandPlay.cards.Concat(h.selectedCards).ToList();
-    // }
 }

@@ -17,3 +17,4 @@ MonoBehaviour:
   cardMat: {fileID: 2100000, guid: 2ef64cd5497be334199bbbfa1166fec2, type: 2}
   colorValue: 0
   symbol: 0
+  priority: 10

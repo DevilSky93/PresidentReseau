@@ -34,9 +34,10 @@ public class Hand : NetworkBehaviour
         if (selectedCards.Count <= 0) return;
         if (GameManager.currentCardsPlay.Count > 0)
         {
-            if (selectedCards[0].value.Value >= GameManager.currentCardsPlay.Peek().value.Value)
+            if (selectedCards[0].priority.Value >= GameManager.currentCardsPlay.Peek().priority.Value)
             {
                 MoveCards();
+                EndTurnServerRpc();
             }
             else
             {
@@ -50,24 +51,27 @@ public class Hand : NetworkBehaviour
         else
         {
             MoveCards();
+            EndTurnServerRpc();
         }
         
         selectedCards.Clear();   
     }
 
     [ServerRpc]
-    public void EndTurnServerRpc()
+    private void EndTurnServerRpc()
     {
-        
+        EndTurnClientRpc();
     }
 
     [ClientRpc]
-    public void EndTurnClientRpc()
+    private void EndTurnClientRpc()
     {
         if (NetworkManager.Singleton.ConnectedClients.TryGetValue(NetworkManager.Singleton.LocalClientId,
             out var networkedClient))
         {
             networkedClient.PlayerObject.GetComponent<Player>().canPlay.Value = false;
+            // GameManager.instance.turnCounter.Value++;
+            // NetworkManager.Singleton.ConnectedClientsList[GameManager.instance.turnCounter.Value].PlayerObject.GetComponent<Player>().canPlay.Value = true;
         }
     }
 

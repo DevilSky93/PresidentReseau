@@ -1,19 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using DG.Tweening;
+﻿using DG.Tweening;
 using MLAPI;
-using MLAPI.Connection;
 using MLAPI.Messaging;
 using MLAPI.NetworkVariable;
 using UnityEngine;
-using UnityEngine.EventSystems;
 
 public class Card : NetworkBehaviour
 {
     public CardData card;
     public MeshRenderer theRenderer;
     public Hand isInHandOf;
-    public BoxCollider collider;
     
     public NetworkVariable<int> value = new NetworkVariable<int>(new NetworkVariableSettings
     {
@@ -47,6 +42,12 @@ public class Card : NetworkBehaviour
         WritePermission = NetworkVariablePermission.Everyone,
         ReadPermission = NetworkVariablePermission.Everyone
     });
+    
+    public NetworkVariableInt priority = new NetworkVariableInt(new NetworkVariableSettings
+    {
+        WritePermission = NetworkVariablePermission.Everyone,
+        ReadPermission = NetworkVariablePermission.Everyone
+    });
 
     private void Update()
     {
@@ -54,6 +55,8 @@ public class Card : NetworkBehaviour
         {
             transform.localPosition = position.Value;
         }
+        
+        // MovingCardServerRpc();
     }
 
     public void InitCard(Hand h)
@@ -64,6 +67,7 @@ public class Card : NetworkBehaviour
         nameCard.Value = card.NameCard;
         colorValue.Value = card.ColorValue;
         symbol.Value = card.Symbol;
+        priority.Value = card.Priority;
     }
 
     private void OnMouseEnter()
@@ -92,20 +96,36 @@ public class Card : NetworkBehaviour
         var mousePos = Input.mousePosition;
         
         transform.position = new Vector3(GetMouseWorldPos().x + _offset.x, GetMouseWorldPos().y + _offset.y, transform.position.z);
+        
+    }
+
+    [ServerRpc]
+    private void MovingCardServerRpc()
+    {
+        MovingCardClientRpc();
+    }
+
+    [ClientRpc]
+    private void MovingCardClientRpc()
+    {
+        if (_isInHand)
+        {
+            transform.localPosition = position.Value;
+        }
     }
 
     private void OnMouseExit()
     {
-        // if (_isInHand && !_isSelected)
-        // {
-        //     transform.DOLocalMove(new Vector3(0f, 0f, transform.localPosition.z), .2f).SetEase(Ease.OutCubic).OnStart(() =>
-        //     {
-        //         _isOver = false;
-        //     }).OnUpdate(() =>
-        //     {
-        //         position.Value = transform.localPosition;
-        //     });
-        // }
+        if (_isInHand && !_isSelected)
+        {
+            transform.DOLocalMove(new Vector3(0f, 0f, transform.localPosition.z), .2f).SetEase(Ease.OutCubic).OnStart(() =>
+            {
+                _isOver = false;
+            }).OnUpdate(() =>
+            {
+                position.Value = transform.localPosition;
+            });
+        }
     }
 
     private void OnMouseUp()
